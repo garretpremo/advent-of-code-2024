@@ -19,35 +19,54 @@ func main() {
 	lines := util.ReadLines(input)
 
 	solvePart1(lines)
-	//solvePart2(lines)
+	solvePart2(lines)
 }
 
 func solvePart1(lines []string) {
+	solve(lines, 0)
+}
 
+func solvePart2(lines []string) {
+	solve(lines, 1)
+}
+
+func solve(reports []string, dampenerStrength int) {
 	safeLines := 0
 
-	for _, line := range lines {
-		if len(line) < 1 {
+	for _, report := range reports {
+		if len(report) < 1 {
 			continue
 		}
 
-		levels := strings.Split(line, " ")
-		var lastLevel int
-		var shouldAscend bool
-		safe := true
+		levelStrings := strings.Split(report, " ")
+		levels := []int{}
 
-		for i, levelString := range levels {
-			levelParsed, _ := strconv.ParseInt(levelString, 10, 32)
-			level := int(levelParsed)
+		for _, levelString := range levelStrings {
+			level, _ := strconv.Atoi(levelString)
+			levels = append(levels, level)
+		}
 
-			if i > 0 {
-				difference := max(lastLevel, level) - min(lastLevel, level)
+		if isReportSafe(levels, dampenerStrength) {
+			safeLines++
+		}
+	}
 
-				if difference == 0 || difference > 3 {
-					safe = false
-					break
-				}
+	fmt.Println(safeLines)
+}
 
+func isReportSafe(levels []int, dampenerStrength int) bool {
+	var lastLevel int
+	var shouldAscend bool
+	safe := true
+	badLevels := 0
+
+	for i, level := range levels {
+		if i > 0 {
+			difference := max(lastLevel, level) - min(lastLevel, level)
+
+			if difference == 0 || difference > 3 {
+				safe = false
+			} else {
 				ascending := level > lastLevel
 
 				if i == 1 {
@@ -58,14 +77,35 @@ func solvePart1(lines []string) {
 					safe = false
 				}
 			}
-
-			lastLevel = level
 		}
 
-		if safe {
-			safeLines++
+		if !safe {
+			safe = true
+			badLevels++
+		}
+
+		lastLevel = level
+	}
+
+	if dampenerStrength < 1 {
+		return badLevels == 0
+	}
+
+	for i := range levels {
+		levelsCopy := make([]int, len(levels))
+		copy(levelsCopy, levels)
+
+		if i == len(levels)-1 {
+			levelsCopy = levelsCopy[:len(levels)-1]
+		} else {
+			copy(levelsCopy[i:], levelsCopy[i+1:])
+			levelsCopy = levelsCopy[:len(levelsCopy)-1]
+		}
+
+		if isReportSafe(levelsCopy, dampenerStrength-1) {
+			return true
 		}
 	}
 
-	fmt.Println(safeLines)
+	return badLevels == 0
 }
