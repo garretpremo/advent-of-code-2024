@@ -5,5 +5,5 @@ import (
 )
 
 func ReadLines(bytes []byte) []string {
-	return strings.Split(strings.TrimSpace(string(bytes)), "\r\n")
+	return strings.Split(strings.TrimSpace(string(bytes)), "\n")
 }

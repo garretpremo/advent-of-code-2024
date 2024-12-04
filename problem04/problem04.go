@@ -4,6 +4,7 @@ import (
 	"advent-of-code-2024/util"
 	_ "embed"
 	"fmt"
+	"regexp"
 	"slices"
 )
 
@@ -22,6 +23,7 @@ func main() {
 	}
 
 	solvePart1(matrix)
+	solvePart2(matrix)
 }
 
 func solvePart1(matrix [][]byte) {
@@ -70,4 +72,30 @@ func checkXmasPart1(matrix [][]byte, x int, y int) int {
 	}
 
 	return found
+}
+
+func solvePart2(matrix [][]byte) {
+	found := 0
+
+	regex := regexp.MustCompile("MMSS")
+
+	for y := 1; y < len(matrix)-1; y++ {
+		for x := 1; x < len(matrix[0])-1; x++ {
+			if matrix[y][x] != 'A' {
+				continue
+			}
+
+			topLeft := matrix[y-1][x-1]
+			topRight := matrix[y-1][x+1]
+			bottomLeft := matrix[y+1][x-1]
+			bottomRight := matrix[y+1][x+1]
+
+			corners := string([]byte{topLeft, topRight, bottomRight, bottomLeft})
+			corners += corners
+			if regex.Match([]byte(corners)) {
+				found++
+			}
+		}
+	}
+	fmt.Println(found)
 }
