@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 //go:embed test3.txt
@@ -19,7 +20,7 @@ func main() {
 	lines := util.ReadLines(input)
 
 	solvePart1(lines)
-	//solvePart2(lines)
+	solvePart2(lines)
 }
 
 func solvePart1(lines []string) {
@@ -37,4 +38,22 @@ func solvePart1(lines []string) {
 		}
 	}
 	fmt.Println(sum)
+}
+
+func solvePart2(lines []string) {
+	input := "do()" + strings.Join(lines, "")
+
+	input = strings.ReplaceAll(input, "do()", "|||||do()")
+	input = strings.ReplaceAll(input, "don't()", "|||||don't()")
+
+	lines2 := strings.Split(input, "|||||")
+	lines3 := lines2[:0]
+
+	for _, line := range lines2 {
+		if strings.HasPrefix(line, "do()") {
+			lines3 = append(lines3, line)
+		}
+	}
+
+	solvePart1(lines3)
 }
